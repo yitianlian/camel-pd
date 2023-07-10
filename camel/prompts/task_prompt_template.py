@@ -21,7 +21,9 @@ from camel.prompts import (
     SolutionExtractionPromptTemplateDict,
     TextPromptDict,
     TranslationPromptTemplateDict,
+    # GamePromptTemplateDict,
 )
+from camel.prompts.game import GamePromptTemplateDict
 from camel.typing import TaskType
 
 
@@ -50,4 +52,6 @@ class TaskPromptTemplateDict(Dict[Any, TextPromptDict]):
             EvaluationPromptTemplateDict(),
             TaskType.SOLUTION_EXTRACTION:
             SolutionExtractionPromptTemplateDict(),
+            TaskType.GAME:
+            GamePromptTemplateDict(),
         })

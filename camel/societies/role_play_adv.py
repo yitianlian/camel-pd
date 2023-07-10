@@ -12,13 +12,14 @@
 # limitations under the License.
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
 from typing import Dict, List, Optional, Sequence, Tuple, Union
-import ipdb
+import re
 
 from camel.agents import (
     ChatAgent,
     CriticAgent,
     TaskPlannerAgent,
     TaskSpecifyAgent,
+    PlayerAgent,
 )
 from camel.agents.chat_agent import ChatAgentResponse
 from camel.generators import SystemMessageGenerator
@@ -26,6 +27,9 @@ from camel.human import Human
 from camel.messages import BaseMessage
 from camel.prompts import TextPrompt
 from camel.typing import ModelType, RoleType, TaskType
+
+
+
 
 
 class RolePlaying:
@@ -96,107 +100,42 @@ class RolePlaying:
         self.with_critic_in_the_loop = with_critic_in_the_loop
         self.model_type = model_type
         self.task_type = task_type
-        self.specified_task_prompt: Optional[TextPrompt]
-        if with_task_specify:
-            task_specify_meta_dict = dict()
-            if self.task_type in [TaskType.AI_SOCIETY, TaskType.MISALIGNMENT]:
-                task_specify_meta_dict.update(
-                    dict(assistant_role=assistant_role_name,
-                         user_role=user_role_name))
-            if extend_task_specify_meta_dict is not None:
-                task_specify_meta_dict.update(extend_task_specify_meta_dict)
-
-            task_specify_agent = TaskSpecifyAgent(
-                self.model_type,
-                task_type=self.task_type,
-                output_language=output_language,
-                **(task_specify_agent_kwargs or {}),
-            )
-            self.specified_task_prompt = task_specify_agent.step(
-                task_prompt,
-                meta_dict=task_specify_meta_dict,
-            )
-            task_prompt = self.specified_task_prompt
-        else:
-            self.specified_task_prompt = None
-
-        self.planned_task_prompt: Optional[TextPrompt]
-        if with_task_planner:
-            task_planner_agent = TaskPlannerAgent(
-                self.model_type,
-                output_language=output_language,
-                **(task_planner_agent_kwargs or {}),
-            )
-            self.planned_task_prompt = task_planner_agent.step(task_prompt)
-            task_prompt = f"{task_prompt}\n{self.planned_task_prompt}"
-        else:
-            self.planned_task_prompt = None
-
-        self.task_prompt = task_prompt
-
         sys_msg_generator = SystemMessageGenerator(
             task_type=self.task_type, **(sys_msg_generator_kwargs or {}))
-
-        sys_msg_meta_dicts = [dict(task=task_prompt)] * 2
-        if (extend_sys_msg_meta_dicts is None and self.task_type
-                in [TaskType.AI_SOCIETY, TaskType.MISALIGNMENT]):
-            extend_sys_msg_meta_dicts = [
-                dict(assistant_role=assistant_role_name,
-                     user_role=user_role_name)
-            ] * 2
-        if extend_sys_msg_meta_dicts is not None:
-            sys_msg_meta_dicts = [{
-                **sys_msg_meta_dict,
-                **extend_sys_msg_meta_dict
-            } for sys_msg_meta_dict, extend_sys_msg_meta_dict in zip(
-                sys_msg_meta_dicts, extend_sys_msg_meta_dicts)]
-        init_assistant_sys_msg, init_user_sys_msg = (
+        
+        self.round_prompt = sys_msg_generator.sys_prompts[RoleType.PLAYER]
+        
+        init_player_1_sys_msg, init_player_2_sys_msg = (
             sys_msg_generator.from_dicts(
-                meta_dicts=sys_msg_meta_dicts,
+                meta_dicts=[{},{}],
                 role_tuples=[
-                    (assistant_role_name, RoleType.ASSISTANT),
-                    (user_role_name, RoleType.USER),
+                    (assistant_role_name, 'begin_prompt'),
+                    (user_role_name, 'begin_prompt'),
                 ],
             ))
 
-        self.assistant_agent: ChatAgent = ChatAgent(
-            init_assistant_sys_msg,
+        self.assistant_agent: PlayerAgent = PlayerAgent(
+            init_player_2_sys_msg,
             model_type,
             output_language=output_language,
             **(assistant_agent_kwargs or {}),
         )
         self.assistant_sys_msg = self.assistant_agent.system_message
 
-        self.user_agent: ChatAgent = ChatAgent(
-            init_user_sys_msg,
+        self.user_agent: PlayerAgent = PlayerAgent(
+            init_player_1_sys_msg,
             model_type,
             output_language=output_language,
             **(user_agent_kwargs or {}),
         )
         self.user_sys_msg = self.user_agent.system_message
-
-        self.critic: Union[CriticAgent, Human, None]
-        if with_critic_in_the_loop:
-            if critic_role_name.lower() == "human":
-                self.critic = Human(**(critic_kwargs or {}))
-            else:
-                critic_criteria = (critic_criteria
-                                   or "improving the task performance")
-                critic_msg_meta_dict = dict(critic_role=critic_role_name,
-                                            criteria=critic_criteria,
-                                            **sys_msg_meta_dicts[0])
-                self.critic_sys_msg = sys_msg_generator.from_dict(
-                    critic_msg_meta_dict,
-                    role_tuple=(critic_role_name, RoleType.CRITIC),
-                )
-                self.critic = CriticAgent(
-                    self.critic_sys_msg,
-                    model_type,
-                    **(critic_kwargs or {}),
-                )
-        else:
-            self.critic = None
-
+        self.value_dict={
+        ("J", "J"): [8,8],
+        ("J", "F"): [0,10],
+        ("F", "J"): [10,0],
+        ("F", "F"): [5,5]
+    }
+        self.option_res={assistant_role_name:[],user_role_name:[]}
     def init_chat(self) -> Tuple[BaseMessage, List[BaseMessage]]:
         r"""Initializes the chat by resetting both of the assistant and user
         agents, and sending the system messages again to the agents using
@@ -212,21 +151,21 @@ class RolePlaying:
         self.user_agent.reset()
 
         # Send the system messages again to the agents using chat messages
-        assistant_msg = BaseMessage.make_assistant_message(
-            role_name=self.assistant_sys_msg.role_name,
-            content=(f"{self.user_sys_msg.content}. "
-                     "Now start to give me instructions one by one. "
-                     "Only reply with Instruction and Input."))
+        assistant_msg = BaseMessage(
+            role_name=self.assistant_sys_msg.role_name,role_type='begin_prompt',meta_dict=None,
+            content=(f"{self.user_sys_msg.content}. "))
+                            
 
-        user_msg = BaseMessage.make_user_message(
-            role_name=self.user_sys_msg.role_name,
+        user_msg = BaseMessage(
+            role_name=self.user_agent.role_name,role_type='begin_prompt',meta_dict=None,
             content=f"{self.assistant_sys_msg.content}")
-        assistant_response = self.assistant_agent.step(user_msg)
-        if assistant_response.terminated or assistant_response.msgs is None:
-            raise ValueError(f"Assistant agent terminated unexpectedly. "
-                             f"Error info: {assistant_response.info}")
+        
+        # assistant_response = self.assistant_agent.step(user_msg)
+        # if assistant_response.terminated or assistant_response.msgs is None:
+        #     raise ValueError(f"Assistant agent terminated unexpectedly. "
+        #                      f"Error info: {assistant_response.info}")
 
-        return assistant_msg, assistant_response.msgs
+        return user_msg,assistant_msg
 
     def reduce_message_options(
         self,
@@ -258,6 +197,7 @@ class RolePlaying:
 
     def step(
         self,
+        user_msg: BaseMessage,
         assistant_msg: BaseMessage,
     ) -> Tuple[ChatAgentResponse, ChatAgentResponse]:
         r"""Advances the conversation by taking a message from the assistant,
@@ -280,25 +220,48 @@ class RolePlaying:
             whether the user agent terminated the conversation, and any
             additional user information.
         """
-        user_response = self.user_agent.step(assistant_msg)
+        user_response = self.user_agent.step(user_msg)
         if user_response.terminated or user_response.msgs is None:
             return (ChatAgentResponse([], False, {}),
                     ChatAgentResponse([], user_response.terminated,
                                       user_response.info))
-        user_msg = self.reduce_message_options(user_response.msgs)
-        self.user_agent.submit_message(user_msg)
+        user_msg_next = self.reduce_message_options(user_response.msgs)
+        self.user_agent.submit_message(user_msg_next)
 
-        assistant_response = self.assistant_agent.step(user_msg)
+        assistant_response = self.assistant_agent.step(assistant_msg)
         if assistant_response.terminated or assistant_response.msgs is None:
             return (ChatAgentResponse([], assistant_response.terminated,
                                       assistant_response.info),
                     ChatAgentResponse([user_msg], False, user_response.info))
-        assistant_msg = self.reduce_message_options(assistant_response.msgs)
-        self.assistant_agent.submit_message(assistant_msg)
+        assistant_msg_next = self.reduce_message_options(assistant_response.msgs)
+        self.assistant_agent.submit_message(assistant_msg_next)
 
         return (
-            ChatAgentResponse([assistant_msg], assistant_response.terminated,
+            ChatAgentResponse([assistant_msg_next], assistant_response.terminated,
                               assistant_response.info),
-            ChatAgentResponse([user_msg], user_response.terminated,
+            ChatAgentResponse([user_msg_next], user_response.terminated,
                               user_response.info),
         )
+    def return_choice(self,choice:str):
+        if "Option J" in choice:
+            return "J"
+        elif "Option F" in choice:
+            return "F"
+        else:
+            return None
+    
+    def generate_next_round_msg(self, round_num:int,you_response:ChatAgentResponse,
+                                other_response:ChatAgentResponse, Player_num:str)->BaseMessage:
+        you_content = you_response.msgs[0].content
+        other_content = other_response.msgs[0].content
+        you_content = self.return_choice(you_content)
+        other_content = self.return_choice(other_content)
+        res=self.value_dict[(you_content,other_content)]
+        meta_dict = dict(pre=round_num,ans1=you_content,ans2=other_content,
+                         res1=res[0],res2=res[1],now=round_num+1)
+        content=self.round_prompt.format(**meta_dict)
+        self.option_res[Player_num].append(you_content)
+        if Player_num == "Player 1":
+            return BaseMessage(role_name=self.user_agent.role_name,role_type='user',meta_dict=meta_dict,content=content)
+        return BaseMessage(role_name=self.assistant_agent.role_name,role_type='user',meta_dict=meta_dict,content=content)
+        

@@ -12,6 +12,7 @@
 # limitations under the License.
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
 from typing import Dict, Generator, List, Optional, Set, Tuple
+import ipdb
 
 from camel.messages import BaseMessage
 from camel.prompts import PromptTemplateGenerator, TextPrompt
@@ -62,18 +63,37 @@ class SystemMessageGenerator:
                 task_type,
                 RoleType.EMBODIMENT,
             )
-
+            
             self.sys_prompts = dict()
+            
             self.sys_prompts[RoleType.ASSISTANT] = assistant_prompt_template
             self.sys_prompts[RoleType.USER] = user_prompt_template
             self.sys_prompts[RoleType.CRITIC] = critic_prompt_template
             self.sys_prompts[RoleType.EMBODIMENT] = embodiment_prompt_template
-
-            self.sys_msg_meta_dict_keys = (
+            
+            if task_type == TaskType.GAME:
+                player_prompt_template = PromptTemplateGenerator().get_system_prompt(
+                    task_type,
+                    'begin_prompt',
+                )
+                round_prompt_template = PromptTemplateGenerator().get_system_prompt(
+                    task_type,
+                    RoleType.PLAYER,
+                )
+                self.sys_prompts['begin_prompt'] = player_prompt_template
+                self.sys_prompts[RoleType.PLAYER] = round_prompt_template
+                self.sys_msg_meta_dict_keys = (
                 assistant_prompt_template.key_words
                 | user_prompt_template.key_words
                 | critic_prompt_template.key_words
-                | embodiment_prompt_template.key_words)
+                | embodiment_prompt_template.key_words
+                | player_prompt_template.key_words)
+            else:
+                self.sys_msg_meta_dict_keys = (
+                    assistant_prompt_template.key_words
+                    | user_prompt_template.key_words
+                    | critic_prompt_template.key_words
+                    | embodiment_prompt_template.key_words)
 
         if RoleType.DEFAULT not in self.sys_prompts:
             self.sys_prompts[RoleType.DEFAULT] = "You are a helpful assistant."
@@ -94,6 +114,7 @@ class SystemMessageGenerator:
         meta_dict: Dict[str, str],
         role_tuple: Tuple[str, RoleType] = ("", RoleType.DEFAULT),
     ) -> BaseMessage:
+
         r"""Generates a system message from a dictionary.
 
         Args:
