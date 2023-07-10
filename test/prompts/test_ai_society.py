@@ -35,3 +35,4 @@ def test_ai_society_prompt_template_dict():
         'task_specify_prompt'] == template_dict.TASK_SPECIFY_PROMPT
     assert template_dict[RoleType.ASSISTANT] == template_dict.ASSISTANT_PROMPT
     assert template_dict[RoleType.USER] == template_dict.USER_PROMPT
+    assert template_dict[RoleType.CRITIC] == template_dict.CRITIC_PROMPT
