@@ -13,7 +13,6 @@
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
 import warnings
 from typing import Any, Optional
-import ipdb
 
 from camel.prompts import TaskPromptTemplateDict, TextPrompt
 from camel.typing import RoleType, TaskType

@@ -41,11 +41,7 @@ class PlayerAgent(ChatAgent):
         message_window_size (int, optional): The maximum number of previous
             messages to include in the context window. If `None`, no windowing
             is performed. (default: :obj:`6`)
-        retry_attempts (int, optional): The number of retry attempts if the
-            critic fails to return a valid option. (default: :obj:`2`)
-        verbose (bool, optional): Whether to print the critic's messages.
-        logger_color (Any): The color of the menu options displayed to the
-            user. (default: :obj:`Fore.MAGENTA`)
+        output_language (str, optional): The language to use for the output
     """
 
     def __init__(

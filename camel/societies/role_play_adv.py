@@ -242,16 +242,42 @@ class RolePlaying:
             ChatAgentResponse([user_msg_next], user_response.terminated,
                               user_response.info),
         )
-    def return_choice(self,choice:str):
+    def return_choice(self, choice: str) -> Union[str, None]:
+        """
+        Returns a specific choice based on the input.
+        
+        Parameters:
+        self (object): The object itself.
+        choice (str): The input choice.
+        
+        Returns:
+        str or None: The specific choice "J" if "Option J" is in the input,
+                    "F" if "Option F" is in the input,
+                    None if neither "Option J" nor "Option F" is in the input.
+        """
         if "Option J" in choice:
             return "J"
         elif "Option F" in choice:
             return "F"
         else:
             return None
+
     
     def generate_next_round_msg(self, round_num:int,you_response:ChatAgentResponse,
                                 other_response:ChatAgentResponse, Player_num:str)->BaseMessage:
+        """
+        Generates the next round message based on the given inputs.
+        
+        Parameters:
+            self (object): The object itself.
+            round_num (int): The current round number.
+            you_response (ChatAgentResponse): The response from the user agent.
+            other_response (ChatAgentResponse): The response from the other agent.
+            Player_num (str): The player number.
+        
+        Returns:
+            BaseMessage: The generated message for the next round.
+        """
         you_content = you_response.msgs[0].content
         other_content = other_response.msgs[0].content
         you_content = self.return_choice(you_content)

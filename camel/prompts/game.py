@@ -19,25 +19,12 @@ from camel.typing import RoleType
 
 # flake8: noqa :E501
 class GamePromptTemplateDict(TextPromptDict):
-    r"""A dictionary containing :obj:`TextPrompt` used in the `AI Society`
-    task.
+    '''
+    This class is used to generate prompts for the game task.
+    BEGIN_PROMPT (TextPrompt): The prompt for the beginning of the game.
+    ROUND_PROMPT (TextPrompt): The prompt for each round of the game.
+    '''
 
-    Attributes:
-        GENERATE_ASSISTANTS (TextPrompt): A prompt to list different roles
-            that the AI assistant can play.
-        GENERATE_USERS (TextPrompt): A prompt to list common groups of
-            internet users or occupations.
-        GENERATE_TASKS (TextPrompt): A prompt to list diverse tasks that
-            the AI assistant can assist AI user with.
-        TASK_SPECIFY_PROMPT (TextPrompt): A prompt to specify a task in more
-            detail.
-        ASSISTANT_PROMPT (TextPrompt): A system prompt for the AI assistant
-            that outlines the rules of the conversation and provides
-            instructions for completing tasks.
-        USER_PROMPT (TextPrompt): A system prompt for the AI user that
-            outlines the rules of the conversation and provides instructions
-            for giving instructions to the AI assistant.
-    """
     BEGIN_PROMPT: TextPrompt = TextPrompt(
         """You are playing a game repeatedly with another player. In this game, you can choose between Option J and Option F. 
             You will play rounds in total with the same player. The rules of the game are as follows:
