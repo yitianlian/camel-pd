@@ -12,7 +12,6 @@
 # limitations under the License.
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
 from typing import Dict, Generator, List, Optional, Set, Tuple
-import ipdb
 
 from camel.messages import BaseMessage
 from camel.prompts import PromptTemplateGenerator, TextPrompt

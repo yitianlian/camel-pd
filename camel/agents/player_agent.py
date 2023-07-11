@@ -11,15 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
-import random
-import warnings
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional
 from tenacity import retry
 from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_exponential
-import ipdb
 
-from colorama import Fore
 
 from camel.agents import ChatAgent, ChatAgentResponse
 from camel.agents.chat_agent import ChatRecord
@@ -52,16 +48,16 @@ class PlayerAgent(ChatAgent):
         message_window_size: int = 6,
         output_language: Optional[str] = None,
     ) -> None:
-        super().__init__(system_message, model, model_config,
-                         message_window_size)
+        super().__init__(system_message, model, model_config, message_window_size)
         self.options_dict: Dict[str, str] = {}
 
     def update_messages(self, role: str, message: BaseMessage) -> List[ChatRecord]:
         self.stored_messages.append(ChatRecord(role, message))
         return self.stored_messages
+
     def submit_message(self, message: BaseMessage) -> None:
-        self.stored_messages.append(ChatRecord('user', message))
-        
+        self.stored_messages.append(ChatRecord("user", message))
+
     @retry(wait=wait_exponential(min=5, max=60), stop=stop_after_attempt(5))
     @openai_api_key_required
     def step(
@@ -82,11 +78,14 @@ class PlayerAgent(ChatAgent):
                 a boolean indicating whether the chat session has terminated,
                 and information about the chat session.
         """
-        messages = self.update_messages('user', input_message)
-        if self.message_window_size is not None and len(
-                messages) > self.message_window_size:
-            messages = [ChatRecord('system', self.system_message)
-                        ] + messages[-self.message_window_size:]
+        messages = self.update_messages("user", input_message)
+        if (
+            self.message_window_size is not None
+            and len(messages) > self.message_window_size
+        ):
+            messages = [ChatRecord("system", self.system_message)] + messages[
+                -self.message_window_size:
+            ]
         openai_messages = [record.to_openai_message() for record in messages]
         num_tokens = num_tokens_from_messages(openai_messages, self.model)
 
@@ -97,11 +96,19 @@ class PlayerAgent(ChatAgent):
             response = self.model_backend.run(openai_messages)
             self.validate_model_response(response)
             if not self.model_backend.stream:
-                output_messages, finish_reasons, usage_dict, response_id = \
-                    self.handle_batch_response(response)
+                (
+                    output_messages,
+                    finish_reasons,
+                    usage_dict,
+                    response_id,
+                ) = self.handle_batch_response(response)
             else:
-                output_messages, finish_reasons, usage_dict, response_id = \
-                    self.handle_stream_response(response, num_tokens)
+                (
+                    output_messages,
+                    finish_reasons,
+                    usage_dict,
+                    response_id,
+                ) = self.handle_stream_response(response, num_tokens)
             info = self.get_info(
                 response_id,
                 usage_dict,
