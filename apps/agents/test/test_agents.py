@@ -38,9 +38,7 @@ def test_utils():
 
 @pytest.mark.model_backend
 def test_session():
-
     for society_name in ("AI Society", "Code"):
-
         state = State.empty()
 
         state, _, _ = cleanup_on_launch(state)
@@ -57,21 +55,9 @@ def test_session():
         max_messages = 10
         with_task_specifier = False
         word_limit = 50
-        (
-            state,
-            specified_task_prompt,
-            planned_task_upd,
-            chat,
-            progress_upd,
-        ) = role_playing_start(
-            state,
-            society_name,
-            assistant,
-            user,
-            original_task,
-            max_messages,
-            with_task_specifier,
-            word_limit,
+        language = "English"
+        state, specified_task_prompt, planned_task_upd, chat, progress_upd = role_playing_start(
+            state, society_name, assistant, user, original_task, max_messages, with_task_specifier, word_limit, language
         )
 
         assert state.session is not None
@@ -81,9 +67,7 @@ def test_session():
         assert state.session is not None
 
         for _ in range(5):
-            state, chat, progress_update, start_bn_update = role_playing_chat_cont(
-                state
-            )
+            state, chat, progress_update, start_bn_update = role_playing_chat_cont(state)
 
         state, _, _ = stop_session(state)
 

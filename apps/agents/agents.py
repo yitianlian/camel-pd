@@ -148,6 +148,7 @@ def role_playing_start(
     max_messages: float,
     with_task_specifier: bool,
     word_limit: int,
+    language: str,
 ) -> Union[Dict, Tuple[State, str, Union[str, Dict], ChatBotHistory, Dict]]:
     """ Creates a role playing session.
 
@@ -207,6 +208,7 @@ def role_playing_start(
             task_type=task_type,
             extend_sys_msg_meta_dicts=extend_sys_msg_meta_dicts,
             extend_task_specify_meta_dict=meta_dict,
+            output_language=language,
         )
     except (openai.error.RateLimitError, tenacity.RetryError, RuntimeError) as ex:
         print("OpenAI API exception 0 " + str(ex))
@@ -459,15 +461,13 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
                     visible=task_specifier_cb.value,
                 )
         with gr.Column():
-            num_messages_sl = gr.Slider(
-                minimum=1,
-                maximum=50,
-                step=1,
-                value=10,
-                interactive=True,
-                label="Messages to generate",
-            )
-
+            with gr.Row():
+                num_messages_sl = gr.Slider(minimum=1, maximum=50, step=1,
+                                            value=10, interactive=True,
+                                            label="Messages to generate")
+            with gr.Row():
+                language_ta = gr.TextArea(label="Language", value="English",
+                                          lines=1, interactive=True)
         with gr.Column(scale=2):
             with gr.Row():
                 start_bn = gr.Button(
@@ -494,7 +494,8 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
         label="Planned task prompt", lines=1, interactive=False, visible=False
     )
     chatbot = gr.Chatbot(label="Chat between autonomous agents")
-    session_state = gr.State(State.empty())
+    empty_state = State.empty()
+    session_state: gr.State = gr.State(empty_state)
 
     universal_task_bn.click(lambda: "Help me to do my job", None, original_task_ta)
 
@@ -502,31 +503,17 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
         lambda v: gr.update(visible=v), task_specifier_cb, ts_word_limit_nb
     )
 
-    start_bn.click(
-        cleanup_on_launch,
-        session_state,
-        [session_state, chatbot, start_bn],
-        queue=False,
-    ).then(
-        role_playing_start,
-        [
-            session_state,
-            society_dd,
-            assistant_ta,
-            user_ta,
-            original_task_ta,
-            num_messages_sl,
-            task_specifier_cb,
-            ts_word_limit_nb,
-        ],
-        [session_state, specified_task_ta, task_prompt_ta, chatbot, progress_sl],
-        queue=False,
-    ).then(
-        role_playing_chat_init,
-        session_state,
-        [session_state, chatbot, progress_sl],
-        queue=False,
-    )
+    start_bn.click(cleanup_on_launch, session_state,
+                   [session_state, chatbot, start_bn], queue=False) \
+            .then(role_playing_start,
+                  [session_state, society_dd, assistant_ta, user_ta,
+                   original_task_ta, num_messages_sl,
+                   task_specifier_cb, ts_word_limit_nb, language_ta],
+                  [session_state, specified_task_ta, task_prompt_ta,
+                   chatbot, progress_sl],
+                  queue=False) \
+            .then(role_playing_chat_init, session_state,
+                  [session_state, chatbot, progress_sl], queue=False)
 
     blocks.load(
         role_playing_chat_cont,
