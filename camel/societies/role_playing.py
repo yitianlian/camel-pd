@@ -187,8 +187,7 @@ class RolePlaying:
                 **(task_specify_agent_kwargs or {}),
             )
             self.specified_task_prompt = task_specify_agent.run(
-                self.task_prompt,
-                meta_dict=task_specify_meta_dict,
+                self.task_prompt, meta_dict=task_specify_meta_dict,
             )
             self.task_prompt = self.specified_task_prompt
 
@@ -343,9 +342,7 @@ class RolePlaying:
                     role_tuple=(critic_role_name, RoleType.CRITIC),
                 )
                 self.critic = CriticAgent(
-                    self.critic_sys_msg,
-                    self.model_type,
-                    **(critic_kwargs or {}),
+                    self.critic_sys_msg, self.model_type, **(critic_kwargs or {}),
                 )
 
     def init_chat(self) -> Tuple[BaseMessage, List[BaseMessage]]:
@@ -385,10 +382,7 @@ class RolePlaying:
 
         return assistant_msg, assistant_response.msgs
 
-    def reduce_message_options(
-        self,
-        messages: Sequence[BaseMessage],
-    ) -> BaseMessage:
+    def reduce_message_options(self, messages: Sequence[BaseMessage],) -> BaseMessage:
         r"""Processes a sequence of chat messages, returning the processed
         message. If multiple messages are provided and
         `with_critic_in_the_loop` is `False`, raises a `ValueError`.
@@ -415,8 +409,7 @@ class RolePlaying:
         return processed_msg
 
     def step(
-        self,
-        assistant_msg: BaseMessage,
+        self, assistant_msg: BaseMessage,
     ) -> Tuple[ChatAgentResponse, ChatAgentResponse]:
         r"""Advances the conversation by taking a message from the assistant,
         processing it using the user agent, and then processing the resulting

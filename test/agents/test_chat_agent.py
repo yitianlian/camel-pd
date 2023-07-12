@@ -33,8 +33,7 @@ parametrize = pytest.mark.parametrize(
 def test_chat_agent(model: ModelType):
     model_config = ChatGPTConfig()
     system_msg = SystemMessageGenerator(task_type=TaskType.AI_SOCIETY).from_dict(
-        dict(assistant_role="doctor"),
-        role_tuple=("doctor", RoleType.ASSISTANT),
+        dict(assistant_role="doctor"), role_tuple=("doctor", RoleType.ASSISTANT),
     )
     assistant = ChatAgent(system_msg, model=model, model_config=model_config)
 
@@ -42,10 +41,7 @@ def test_chat_agent(model: ModelType):
 
     assistant.reset()
     user_msg = BaseMessage(
-        role_name="Patient",
-        role_type=RoleType.USER,
-        meta_dict={},
-        content="Hello!",
+        role_name="Patient", role_type=RoleType.USER, meta_dict={}, content="Hello!",
     )
     assistant_response = assistant.step(user_msg)
 

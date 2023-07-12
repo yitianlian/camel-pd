@@ -57,21 +57,33 @@ def test_session():
         max_messages = 10
         with_task_specifier = False
         word_limit = 50
-        state, specified_task_prompt, planned_task_upd, chat, progress_upd = \
-            role_playing_start(state, society_name, assistant, user,
-                               original_task, max_messages,
-                               with_task_specifier, word_limit)
+        (
+            state,
+            specified_task_prompt,
+            planned_task_upd,
+            chat,
+            progress_upd,
+        ) = role_playing_start(
+            state,
+            society_name,
+            assistant,
+            user,
+            original_task,
+            max_messages,
+            with_task_specifier,
+            word_limit,
+        )
 
         assert state.session is not None
 
-        state, chat, progress_update = \
-            role_playing_chat_init(state)
+        state, chat, progress_update = role_playing_chat_init(state)
 
         assert state.session is not None
 
         for _ in range(5):
-            state, chat, progress_update, start_bn_update =\
-                role_playing_chat_cont(state)
+            state, chat, progress_update, start_bn_update = role_playing_chat_cont(
+                state
+            )
 
         state, _, _ = stop_session(state)
 

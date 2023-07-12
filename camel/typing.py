@@ -65,4 +65,4 @@ class TaskType(Enum):
     GAME = "game"
 
 
-__all__ = ['RoleType', 'ModelType', 'TaskType']
+__all__ = ["RoleType", "ModelType", "TaskType"]

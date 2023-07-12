@@ -21,14 +21,14 @@ from .embodied_agent import EmbodiedAgent
 from .player_agent import PlayerAgent
 
 __all__ = [
-    'BaseAgent',
-    'ChatAgent',
-    'ChatAgentResponse',
-    'TaskSpecifyAgent',
-    'TaskPlannerAgent',
-    'CriticAgent',
-    'BaseToolAgent',
-    'HuggingFaceToolAgent',
-    'EmbodiedAgent',
-    'PlayerAgent',
+    "BaseAgent",
+    "ChatAgent",
+    "ChatAgentResponse",
+    "TaskSpecifyAgent",
+    "TaskPlannerAgent",
+    "CriticAgent",
+    "BaseToolAgent",
+    "HuggingFaceToolAgent",
+    "EmbodiedAgent",
+    "PlayerAgent",
 ]

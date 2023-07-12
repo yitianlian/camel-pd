@@ -23,16 +23,16 @@ from .prompt_templates import PromptTemplateGenerator
 from .game import GamePromptTemplateDict
 
 __all__ = [
-    'TextPrompt',
-    'CodePrompt',
-    'TextPromptDict',
-    'AISocietyPromptTemplateDict',
-    'CodePromptTemplateDict',
-    'MisalignmentPromptTemplateDict',
-    'TranslationPromptTemplateDict',
-    'EvaluationPromptTemplateDict',
-    'TaskPromptTemplateDict',
-    'PromptTemplateGenerator',
-    'SolutionExtractionPromptTemplateDict',
-    'GamePromptTemplateDict',
+    "TextPrompt",
+    "CodePrompt",
+    "TextPromptDict",
+    "AISocietyPromptTemplateDict",
+    "CodePromptTemplateDict",
+    "MisalignmentPromptTemplateDict",
+    "TranslationPromptTemplateDict",
+    "EvaluationPromptTemplateDict",
+    "TaskPromptTemplateDict",
+    "PromptTemplateGenerator",
+    "SolutionExtractionPromptTemplateDict",
+    "GamePromptTemplateDict",
 ]
