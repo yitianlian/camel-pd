@@ -29,10 +29,7 @@ def main(model_type=None) -> None:
         task_type=TaskType.GAME,
     )
 
-    print(
-        Fore.GREEN
-        + f"AI Assistant sys message:\n{role_play_session.assistant_sys_msg}\n"
-    )
+    print(Fore.GREEN + f"AI Assistant sys message:\n{role_play_session.assistant_sys_msg}\n")
     print(Fore.BLUE + f"AI User sys message:\n{role_play_session.user_sys_msg}\n")
 
     print(f"{Fore.YELLOW}Original task prompt:\n{task_prompt}\n")
@@ -42,40 +39,22 @@ def main(model_type=None) -> None:
     user_responses, assistant_responses = [], []
     while n < chat_turn_limit:
         n += 1
-        assistant_response, user_response = role_play_session.step(
-            user_msg, assistant_msg
-        )
+        assistant_response, user_response = role_play_session.step(user_msg, assistant_msg)
         user_responses.append(user_response)
         assistant_responses.append(assistant_response)
-        user_msg = role_play_session.generate_next_round_msg(
-            n, user_response, assistant_response, "Player 1"
-        )
-        assistant_msg = role_play_session.generate_next_round_msg(
-            n, assistant_response, user_response, "Player 2"
-        )
+        user_msg = role_play_session.generate_next_round_msg(n, user_response, assistant_response, "Player 1")
+        assistant_msg = role_play_session.generate_next_round_msg(n, assistant_response, user_response, "Player 2")
         if assistant_response.terminated:
             print(
-                Fore.GREEN
-                + (
-                    "AI Assistant terminated. Reason: "
-                    f"{assistant_response.info['termination_reasons']}."
-                )
+                Fore.GREEN + ("AI Assistant terminated. Reason: " f"{assistant_response.info['termination_reasons']}.")
             )
             break
         if user_response.terminated:
-            print(
-                Fore.GREEN
-                + (
-                    "AI User terminated. "
-                    f"Reason: {user_response.info['termination_reasons']}."
-                )
-            )
+            print(Fore.GREEN + ("AI User terminated. " f"Reason: {user_response.info['termination_reasons']}."))
             break
 
         print_text_animated(Fore.BLUE + f"AI User:\n\n{user_response.msg.content}\n")
-        print_text_animated(
-            f"{Fore.GREEN}AI Assistant:\n\n{assistant_response.msg.content}\n"
-        )
+        print_text_animated(f"{Fore.GREEN}AI Assistant:\n\n{assistant_response.msg.content}\n")
         if "CAMEL_TASK_DONE" in user_response.msg.content:
             break
 
@@ -89,9 +68,7 @@ def main(model_type=None) -> None:
                 "user": user_response.msg.content,
                 "assistant": assistant_response.msg.content,
             }
-            for user_response, assistant_response in zip(
-                user_responses, assistant_responses
-            )
+            for user_response, assistant_response in zip(user_responses, assistant_responses)
         ],
         "option_res": role_play_session.option_res,
     }

@@ -12,20 +12,12 @@
 # limitations under the License.
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
 from typing import Dict, List, Optional, Sequence, Tuple, Union
-import re
 
-from camel.agents import (
-    ChatAgent,
-    CriticAgent,
-    TaskPlannerAgent,
-    TaskSpecifyAgent,
-    PlayerAgent,
-)
+from camel.agents import PlayerAgent
+
 from camel.agents.chat_agent import ChatAgentResponse
 from camel.generators import SystemMessageGenerator
-from camel.human import Human
 from camel.messages import BaseMessage
-from camel.prompts import TextPrompt
 from camel.typing import ModelType, RoleType, TaskType
 
 
@@ -97,9 +89,7 @@ class RolePlaying:
         self.with_critic_in_the_loop = with_critic_in_the_loop
         self.model_type = model_type
         self.task_type = task_type
-        sys_msg_generator = SystemMessageGenerator(
-            task_type=self.task_type, **(sys_msg_generator_kwargs or {})
-        )
+        sys_msg_generator = SystemMessageGenerator(task_type=self.task_type, **(sys_msg_generator_kwargs or {}))
 
         self.round_prompt = sys_msg_generator.sys_prompts[RoleType.PLAYER]
 
@@ -170,7 +160,10 @@ class RolePlaying:
 
         return user_msg, assistant_msg
 
-    def reduce_message_options(self, messages: Sequence[BaseMessage],) -> BaseMessage:
+    def reduce_message_options(
+        self,
+        messages: Sequence[BaseMessage],
+    ) -> BaseMessage:
         r"""Processes a sequence of chat messages, returning the processed
         message. If multiple messages are provided and
         `with_critic_in_the_loop` is `False`, raises a `ValueError`.
@@ -185,9 +178,7 @@ class RolePlaying:
         if len(messages) == 0:
             raise ValueError("No messages to process.")
         if len(messages) > 1 and not self.with_critic_in_the_loop:
-            raise ValueError(
-                "Got than one message to process. " f"Num of messages: {len(messages)}."
-            )
+            raise ValueError("Got than one message to process. " f"Num of messages: {len(messages)}.")
         elif self.with_critic_in_the_loop and self.critic is not None:
             critic_response = self.critic.reduce_step(messages)
             processed_msg = critic_response.msg
@@ -197,7 +188,9 @@ class RolePlaying:
         return processed_msg
 
     def step(
-        self, user_msg: BaseMessage, assistant_msg: BaseMessage,
+        self,
+        user_msg: BaseMessage,
+        assistant_msg: BaseMessage,
     ) -> Tuple[ChatAgentResponse, ChatAgentResponse]:
         r"""Advances the conversation by taking a message from the assistant,
         processing it using the user agent, and then processing the resulting
@@ -231,9 +224,7 @@ class RolePlaying:
         assistant_response = self.assistant_agent.step(assistant_msg)
         if assistant_response.terminated or assistant_response.msgs is None:
             return (
-                ChatAgentResponse(
-                    [], assistant_response.terminated, assistant_response.info
-                ),
+                ChatAgentResponse([], assistant_response.terminated, assistant_response.info),
                 ChatAgentResponse([user_msg], False, user_response.info),
             )
         assistant_msg_next = self.reduce_message_options(assistant_response.msgs)
@@ -245,19 +236,17 @@ class RolePlaying:
                 assistant_response.terminated,
                 assistant_response.info,
             ),
-            ChatAgentResponse(
-                [user_msg_next], user_response.terminated, user_response.info
-            ),
+            ChatAgentResponse([user_msg_next], user_response.terminated, user_response.info),
         )
 
     def return_choice(self, choice: str) -> Union[str, None]:
         """
         Returns a specific choice based on the input.
-        
+
         Parameters:
         self (object): The object itself.
         choice (str): The input choice.
-        
+
         Returns:
         str or None: The specific choice "J" if "Option J" is in the input,
                     "F" if "Option F" is in the input,
@@ -279,14 +268,14 @@ class RolePlaying:
     ) -> BaseMessage:
         """
         Generates the next round message based on the given inputs.
-        
+
         Parameters:
             self (object): The object itself.
             round_num (int): The current round number.
             you_response (ChatAgentResponse): The response from the user agent.
             other_response (ChatAgentResponse): The response from the other agent.
             Player_num (str): The player number.
-        
+
         Returns:
             BaseMessage: The generated message for the next round.
         """

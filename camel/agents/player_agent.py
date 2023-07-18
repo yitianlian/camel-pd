@@ -59,7 +59,10 @@ class PlayerAgent(ChatAgent):
 
     @retry(wait=wait_exponential(min=5, max=60), stop=stop_after_attempt(5))
     @openai_api_key_required
-    def step(self, input_message: BaseMessage,) -> ChatAgentResponse:
+    def step(
+        self,
+        input_message: BaseMessage,
+    ) -> ChatAgentResponse:
         r"""Performs a single step in the chat session by generating a response
         to the input message.
 
@@ -75,13 +78,8 @@ class PlayerAgent(ChatAgent):
                 and information about the chat session.
         """
         messages = self.update_messages("user", input_message)
-        if (
-            self.message_window_size is not None
-            and len(messages) > self.message_window_size
-        ):
-            messages = [ChatRecord("system", self.system_message)] + messages[
-                -self.message_window_size :
-            ]
+        if self.message_window_size is not None and len(messages) > self.message_window_size:
+            messages = [ChatRecord("system", self.system_message)] + messages[-self.message_window_size :]
         openai_messages = [record.to_openai_message() for record in messages]
         num_tokens = num_tokens_from_messages(openai_messages, self.model)
 
@@ -105,11 +103,21 @@ class PlayerAgent(ChatAgent):
                     usage_dict,
                     response_id,
                 ) = self.handle_stream_response(response, num_tokens)
-            info = self.get_info(response_id, usage_dict, finish_reasons, num_tokens,)
+            info = self.get_info(
+                response_id,
+                usage_dict,
+                finish_reasons,
+                num_tokens,
+            )
         else:
             self.terminated = True
             output_messages = []
 
-            info = self.get_info(None, None, ["max_tokens_exceeded"], num_tokens,)
+            info = self.get_info(
+                None,
+                None,
+                ["max_tokens_exceeded"],
+                num_tokens,
+            )
 
         return ChatAgentResponse(output_messages, self.terminated, info)
