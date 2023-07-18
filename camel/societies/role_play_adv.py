@@ -14,7 +14,6 @@
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from camel.agents import PlayerAgent
-
 from camel.agents.chat_agent import ChatAgentResponse
 from camel.generators import SystemMessageGenerator
 from camel.messages import BaseMessage

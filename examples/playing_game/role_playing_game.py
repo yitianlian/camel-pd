@@ -11,12 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
+import json
+
 from colorama import Fore
 
 from camel.societies.role_play_adv import RolePlaying
-from camel.utils import print_text_animated
 from camel.typing import TaskType
-import json
+from camel.utils import print_text_animated
 
 
 def main(model_type=None) -> None:

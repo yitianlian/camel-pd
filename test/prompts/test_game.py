@@ -12,8 +12,8 @@
 # limitations under the License.
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
 from camel.prompts import TextPrompt
-from camel.typing import RoleType
 from camel.prompts.game import GamePromptTemplateDict
+from camel.typing import RoleType
 
 
 def test_game_prompt_template_dict():

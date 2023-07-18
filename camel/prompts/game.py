@@ -46,5 +46,8 @@ class GamePromptTemplateDict(TextPromptDict):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.update(
-            {"begin_prompt": self.BEGIN_PROMPT, RoleType.PLAYER: self.ROUND_PROMPT,}
+            {
+                "begin_prompt": self.BEGIN_PROMPT,
+                RoleType.PLAYER: self.ROUND_PROMPT,
+            }
         )
