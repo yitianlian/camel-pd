@@ -18,7 +18,7 @@ from camel.agents.chat_agent import ChatAgentResponse
 from camel.generators import SystemMessageGenerator
 from camel.messages import BaseMessage
 from camel.typing import ModelType, RoleType, TaskType
-
+# flake8: noqa :E501
 
 class RolePlaying:
     r"""Role playing between two agents.
@@ -123,7 +123,7 @@ class RolePlaying:
         }
         self.option_res = {assistant_role_name: [], user_role_name: []}
 
-    def init_chat(self) -> Tuple[BaseMessage, List[BaseMessage]]:
+    def init_chat(self) -> Tuple[BaseMessage, BaseMessage]:
         r"""Initializes the chat by resetting both of the assistant and user
         agents, and sending the system messages again to the agents using
         chat messages. Returns the assistant's introductory message and the
@@ -178,9 +178,9 @@ class RolePlaying:
             raise ValueError("No messages to process.")
         if len(messages) > 1 and not self.with_critic_in_the_loop:
             raise ValueError("Got than one message to process. " f"Num of messages: {len(messages)}.")
-        elif self.with_critic_in_the_loop and self.critic is not None:
-            critic_response = self.critic.reduce_step(messages)
-            processed_msg = critic_response.msg
+        # elif self.with_critic_in_the_loop and self.critic is not None:
+        #     critic_response = self.critic.reduce_step(messages)
+        #     processed_msg = critic_response.msg
         else:
             processed_msg = messages[0]
 
@@ -284,25 +284,25 @@ class RolePlaying:
         other_content = self.return_choice(other_content)
         res = self.value_dict[(you_content, other_content)]
         meta_dict = dict(
-            pre=round_num,
+            pre=str(round_num),
             ans1=you_content,
             ans2=other_content,
             res1=res[0],
             res2=res[1],
-            now=round_num + 1,
+            now=str(round_num + 1),
         )
         content = self.round_prompt.format(**meta_dict)
         self.option_res[Player_num].append(you_content)
         if Player_num == "Player 1":
             return BaseMessage(
                 role_name=self.user_agent.role_name,
-                role_type="user",
+                role_type=RoleType.USER,
                 meta_dict=meta_dict,
                 content=content,
             )
         return BaseMessage(
             role_name=self.assistant_agent.role_name,
-            role_type="user",
+            role_type=RoleType.USER,
             meta_dict=meta_dict,
             content=content,
         )

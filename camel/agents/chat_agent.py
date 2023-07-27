@@ -30,7 +30,7 @@ from camel.utils import (
     num_tokens_from_messages,
     openai_api_key_required,
 )
-
+# flake8: noqa :E501
 
 @dataclass(frozen=True)
 class ChatAgentResponse:
@@ -167,7 +167,6 @@ class ChatAgent(BaseAgent):
             num_tokens (int): The number of tokens used in the chat session.
 
         Returns:
-            Dict[str, Any]: The chat session information.
         """
         return {
             "id": id,

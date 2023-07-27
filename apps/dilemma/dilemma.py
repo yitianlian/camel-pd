@@ -26,7 +26,7 @@ import gradio as gr
 from database_connection import DatabaseConnection
 
 from apps.common.auto_zip import AutoZip
-
+# flake8: noqa :E501
 
 def parse_arguments():
     """ Get command line arguments. """

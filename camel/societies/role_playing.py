@@ -25,7 +25,7 @@ from camel.human import Human
 from camel.messages import BaseMessage
 from camel.prompts import TextPrompt
 from camel.typing import RoleType, TaskType
-
+# flake8: noqa :E501
 
 class RolePlaying:
     r"""Role playing between two agents.

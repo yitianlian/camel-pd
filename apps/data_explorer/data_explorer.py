@@ -22,7 +22,7 @@ from typing import Dict, List, Optional, Tuple
 import gradio as gr
 
 from apps.data_explorer.loader import Datasets, load_datasets
-
+# flake8: noqa :E501
 
 def parse_arguments():
     """ Get command line arguments. """

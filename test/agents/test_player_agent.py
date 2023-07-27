@@ -153,9 +153,3 @@ def test_set_output_language():
     )
     assert agent.system_message.content == updated_system_message.content
 
-
-if __name__ == "__main__":
-    # test_chat_agent(ModelType.GPT_4)
-    # test_chat_agent_stream_output()
-    test_set_output_language()
-    # pytest.main()
