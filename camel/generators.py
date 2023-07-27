@@ -65,12 +65,12 @@ class SystemMessageGenerator:
 
             if task_type == TaskType.GAME:
                 player_prompt_template = PromptTemplateGenerator().get_system_prompt(
-                    task_type, "begin_prompt",
+                    task_type, RoleType.PLAYER_BEGIN,
                 )
                 round_prompt_template = PromptTemplateGenerator().get_system_prompt(
                     task_type, RoleType.PLAYER,
                 )
-                self.sys_prompts["begin_prompt"] = player_prompt_template
+                self.sys_prompts[RoleType.PLAYER_BEGIN] = player_prompt_template
                 self.sys_prompts[RoleType.PLAYER] = round_prompt_template
                 self.sys_msg_meta_dict_keys = (
                     assistant_prompt_template.key_words

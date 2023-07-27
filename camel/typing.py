@@ -21,6 +21,7 @@ class RoleType(Enum):
     EMBODIMENT = "embodiment"
     DEFAULT = "default"
     PLAYER = "player"
+    PLAYER_BEGIN = "begin_prompt"
 
 
 class ModelType(Enum):

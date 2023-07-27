@@ -95,8 +95,8 @@ class RolePlaying:
         init_player_1_sys_msg, init_player_2_sys_msg = sys_msg_generator.from_dicts(
             meta_dicts=[{}, {}],
             role_tuples=[
-                (assistant_role_name, "begin_prompt"),
-                (user_role_name, "begin_prompt"),
+                (assistant_role_name, RoleType.PLAYER_BEGIN),
+                (user_role_name, RoleType.PLAYER_BEGIN),
             ],
         )
 
@@ -140,14 +140,14 @@ class RolePlaying:
         # Send the system messages again to the agents using chat messages
         assistant_msg = BaseMessage(
             role_name=self.assistant_sys_msg.role_name,
-            role_type="begin_prompt",
+            role_type=RoleType.PLAYER_BEGIN,
             meta_dict=None,
             content=(f"{self.user_sys_msg.content}. "),
         )
 
         user_msg = BaseMessage(
             role_name=self.user_agent.role_name,
-            role_type="begin_prompt",
+            role_type=RoleType.PLAYER_BEGIN,
             meta_dict=None,
             content=f"{self.assistant_sys_msg.content}",
         )
