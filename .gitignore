@@ -424,3 +424,4 @@ camel_data/
 
 ./examples/ai_society/role_playing_my.py
 ./test/agents/test_player_agent.py
+./examples/generate_role
