@@ -37,4 +37,5 @@ __all__ = [
     'BaseToolAgent',
     'HuggingFaceToolAgent',
     'EmbodiedAgent',
+    'PlayerAgent'
 ]

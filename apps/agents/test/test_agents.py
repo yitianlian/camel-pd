@@ -25,6 +25,7 @@ from apps.agents.agents import (
     stop_session,
 )
 
+
 # flake8: noqa :E501
 def test_construct_blocks():
     blocks = construct_blocks(None)

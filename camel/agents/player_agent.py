@@ -18,7 +18,8 @@ from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_exponential
 
 from camel.agents import ChatAgent, ChatAgentResponse
-from camel.agents.chat_agent import ChatRecord
+from camel.agents.chat_agent import ChatRecord, FunctionCallingRecord
+from camel.functions import OpenAIFunction
 from camel.messages import BaseMessage
 from camel.typing import ModelType
 from camel.utils import num_tokens_from_messages, openai_api_key_required
@@ -47,11 +48,23 @@ class PlayerAgent(ChatAgent):
         model_config: Optional[Any] = None,
         message_window_size: int = 6,
         output_language: Optional[str] = None,
+        function_list: Optional[List[OpenAIFunction]] = None,
     ) -> None:
-        super().__init__(system_message, model, model_config, message_window_size)
+        super().__init__(
+            system_message,
+            model,
+            model_config,
+            message_window_size,
+            output_language,
+            function_list,
+        )
         self.options_dict: Dict[str, str] = {}
 
-    def update_messages(self, role: str, message: BaseMessage) -> List[ChatRecord]:
+    def update_messages(
+        self, role: str, message: BaseMessage
+    ) -> List[ChatRecord]:
+        if role not in {"system", "user", "assistant", "function"}:
+            raise ValueError(f"Unsupported role {role}")
         self.stored_messages.append(ChatRecord(role, message))
         return self.stored_messages
 
@@ -78,16 +91,22 @@ class PlayerAgent(ChatAgent):
                 a boolean indicating whether the chat session has terminated,
                 and information about the chat session.
         """
-        messages = self.update_messages("user", input_message)
-        if self.message_window_size is not None and len(messages) > self.message_window_size:
-            messages = [ChatRecord("system", self.system_message)] + messages[-self.message_window_size :]
-        openai_messages = [record.to_openai_message() for record in messages]
-        num_tokens = num_tokens_from_messages(openai_messages, self.model)
-
         output_messages: Optional[List[BaseMessage]]
         info: Dict[str, Any]
-
-        if num_tokens < self.model_token_limit:
+        called_funcs: List[FunctionCallingRecord] = []
+        messages = self.update_messages("user", input_message)
+        if (
+            self.message_window_size is not None
+            and len(messages) > self.message_window_size
+        ):
+            messages = [ChatRecord("system", self.system_message)] + messages[
+                -self.message_window_size :
+            ]
+        openai_messages = [record.to_openai_message() for record in messages]
+        num_tokens = num_tokens_from_messages(openai_messages, self.model)
+        if num_tokens >= self.model_token_limit:
+            return self.step_token_exceed(num_tokens, called_funcs)
+        else:
             response = self.model_backend.run(openai_messages)
             self.validate_model_response(response)
             if not self.model_backend.stream:
@@ -104,21 +123,40 @@ class PlayerAgent(ChatAgent):
                     usage_dict,
                     response_id,
                 ) = self.handle_stream_response(response, num_tokens)
-            info = self.get_info(
-                response_id,
-                usage_dict,
-                finish_reasons,
-                num_tokens,
-            )
-        else:
-            self.terminated = True
-            output_messages = []
 
-            info = self.get_info(
-                None,
-                None,
-                ["max_tokens_exceeded"],
-                num_tokens,
-            )
+            if (
+                self.is_function_calling_enabled()
+                and finish_reasons[0] == "function_call"
+            ):
+                # Do function calling
+                (
+                    func_assistant_msg,
+                    func_result_msg,
+                    func_record,
+                ) = self.step_function_call(response)
+
+                # Update the messages
+                messages = self.update_messages(
+                    "assistant", func_assistant_msg
+                )
+                messages = self.update_messages("function", func_result_msg)
+                called_funcs.append(func_record)
+            else:
+                # Function calling disabled or chat stopped
+                info = self.get_info(
+                    response_id,
+                    usage_dict,
+                    finish_reasons,
+                    num_tokens,
+                    called_funcs,
+                )
 
         return ChatAgentResponse(output_messages, self.terminated, info)
+
+    def __repr__(self) -> str:
+        r"""Returns a string representation of the :obj:`ChatAgent`.
+
+        Returns:
+            str: The string representation of the :obj:`ChatAgent`.
+        """
+        return f"PlayerAgent({self.role_name}, {self.role_type}, {self.model})"

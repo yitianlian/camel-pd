@@ -18,7 +18,9 @@ from camel.agents.chat_agent import ChatAgentResponse
 from camel.generators import SystemMessageGenerator
 from camel.messages import BaseMessage
 from camel.typing import ModelType, RoleType, TaskType
+
 # flake8: noqa :E501
+
 
 class RolePlaying:
     r"""Role playing between two agents.
@@ -88,11 +90,16 @@ class RolePlaying:
         self.with_critic_in_the_loop = with_critic_in_the_loop
         self.model_type = model_type
         self.task_type = task_type
-        sys_msg_generator = SystemMessageGenerator(task_type=self.task_type, **(sys_msg_generator_kwargs or {}))
+        sys_msg_generator = SystemMessageGenerator(
+            task_type=self.task_type, **(sys_msg_generator_kwargs or {})
+        )
 
         self.round_prompt = sys_msg_generator.sys_prompts[RoleType.PLAYER]
 
-        init_player_1_sys_msg, init_player_2_sys_msg = sys_msg_generator.from_dicts(
+        (
+            init_player_1_sys_msg,
+            init_player_2_sys_msg,
+        ) = sys_msg_generator.from_dicts(
             meta_dicts=[{}, {}],
             role_tuples=[
                 (assistant_role_name, RoleType.PLAYER_BEGIN),
@@ -121,7 +128,10 @@ class RolePlaying:
             ("F", "J"): [10, 0],
             ("F", "F"): [5, 5],
         }
-        self.option_res = {assistant_role_name: [], user_role_name: []}
+        self.option_res: Dict[str, list] = {
+            assistant_role_name: [],
+            user_role_name: [],
+        }
 
     def init_chat(self) -> Tuple[BaseMessage, BaseMessage]:
         r"""Initializes the chat by resetting both of the assistant and user
@@ -177,7 +187,10 @@ class RolePlaying:
         if len(messages) == 0:
             raise ValueError("No messages to process.")
         if len(messages) > 1 and not self.with_critic_in_the_loop:
-            raise ValueError("Got than one message to process. " f"Num of messages: {len(messages)}.")
+            raise ValueError(
+                "Got than one message to process. "
+                f"Num of messages: {len(messages)}."
+            )
         # elif self.with_critic_in_the_loop and self.critic is not None:
         #     critic_response = self.critic.reduce_step(messages)
         #     processed_msg = critic_response.msg
@@ -215,7 +228,9 @@ class RolePlaying:
         if user_response.terminated or user_response.msgs is None:
             return (
                 ChatAgentResponse([], False, {}),
-                ChatAgentResponse([], user_response.terminated, user_response.info),
+                ChatAgentResponse(
+                    [], user_response.terminated, user_response.info
+                ),
             )
         user_msg_next = self.reduce_message_options(user_response.msgs)
         self.user_agent.submit_message(user_msg_next)
@@ -223,10 +238,14 @@ class RolePlaying:
         assistant_response = self.assistant_agent.step(assistant_msg)
         if assistant_response.terminated or assistant_response.msgs is None:
             return (
-                ChatAgentResponse([], assistant_response.terminated, assistant_response.info),
+                ChatAgentResponse(
+                    [], assistant_response.terminated, assistant_response.info
+                ),
                 ChatAgentResponse([user_msg], False, user_response.info),
             )
-        assistant_msg_next = self.reduce_message_options(assistant_response.msgs)
+        assistant_msg_next = self.reduce_message_options(
+            assistant_response.msgs
+        )
         self.assistant_agent.submit_message(assistant_msg_next)
 
         return (
@@ -235,10 +254,12 @@ class RolePlaying:
                 assistant_response.terminated,
                 assistant_response.info,
             ),
-            ChatAgentResponse([user_msg_next], user_response.terminated, user_response.info),
+            ChatAgentResponse(
+                [user_msg_next], user_response.terminated, user_response.info
+            ),
         )
 
-    def return_choice(self, choice: str) -> Union[str, None]:
+    def return_choice(self, choice: str) -> str:
         """
         Returns a specific choice based on the input.
 
@@ -251,12 +272,12 @@ class RolePlaying:
                     "F" if "Option F" is in the input,
                     None if neither "Option J" nor "Option F" is in the input.
         """
-        if "Option J" in choice:
+        if "option j" in choice.lower():
             return "J"
-        elif "Option F" in choice:
+        elif "option f" in choice.lower():
             return "F"
         else:
-            return None
+            raise ValueError("Invalid choice.")
 
     def generate_next_round_msg(
         self,
@@ -287,8 +308,8 @@ class RolePlaying:
             pre=str(round_num),
             ans1=you_content,
             ans2=other_content,
-            res1=res[0],
-            res2=res[1],
+            res1=str(res[0]),
+            res2=str(res[1]),
             now=str(round_num + 1),
         )
         content = self.round_prompt.format(**meta_dict)

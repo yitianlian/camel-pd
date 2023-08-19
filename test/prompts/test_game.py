@@ -25,5 +25,5 @@ def test_game_prompt_template_dict():
 
     # Test if the prompts are correctly added to the dictionary
 
-    assert template_dict["begin_prompt"] == template_dict.BEGIN_PROMPT
+    assert template_dict[RoleType.PLAYER_BEGIN] == template_dict.BEGIN_PROMPT
     assert template_dict[RoleType.PLAYER] == template_dict.ROUND_PROMPT
