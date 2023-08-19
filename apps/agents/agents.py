@@ -32,6 +32,7 @@ from camel.agents import TaskSpecifyAgent
 from camel.messages import BaseMessage
 from camel.societies import RolePlaying
 from camel.typing import TaskType
+
 # flake8: noqa :E501
 REPO_ROOT = os.path.realpath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "../..")
