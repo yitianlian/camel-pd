@@ -78,7 +78,8 @@ def generate_data(
 
     sys_msg_generator = SystemMessageGenerator(task_type=TaskType.CODE)
     sys_msg_meta_dicts = [
-        dict(language=language_name, domain=domain_name, task=specified_task_prompt)
+        dict(language=language_name, domain=domain_name,
+             task=specified_task_prompt)
     ] * 2
     assistant_sys_msg, user_sys_msg = sys_msg_generator.from_dicts(
         sys_msg_meta_dicts,
@@ -88,7 +89,8 @@ def generate_data(
         ],
     )
 
-    assistant_agent = ChatAgent(assistant_sys_msg, message_window_size=max_num_messages)
+    assistant_agent = ChatAgent(
+        assistant_sys_msg, message_window_size=max_num_messages)
     user_agent = ChatAgent(user_sys_msg, message_window_size=max_num_messages)
 
     input_assistant_msg, _ = init_chat(
@@ -191,7 +193,8 @@ def generate_data(
 
         # Save user message
         message_counter += 1
-        message_dict[f"message_{message_counter}"] = user_response.msg.to_dict()
+        message_dict[f"message_{message_counter}"] = user_response.msg.to_dict(
+        )
 
         # Condition 5: End token observed
         if "<CAMEL_TASK_DONE>" in user_response.msg.content:
@@ -200,7 +203,8 @@ def generate_data(
 
         # Save assistant message
         message_counter += 1
-        message_dict[f"message_{message_counter}"] = assistant_response.msg.to_dict()
+        message_dict[f"message_{message_counter}"] = assistant_response.msg.to_dict(
+        )
 
         input_assistant_msg = assistant_response.msg
 
@@ -250,7 +254,7 @@ def main() -> None:
 
     assert (array_idx + 1) * languages_per_chunk <= len(languages)
     languages = languages[
-        array_idx * languages_per_chunk : (array_idx + 1) * languages_per_chunk
+        array_idx * languages_per_chunk: (array_idx + 1) * languages_per_chunk
     ]
 
     pool = multiprocessing.Pool()
@@ -267,7 +271,7 @@ def main() -> None:
                 # Filter out the generated response to include the tasks only
                 for i, task in enumerate(tasks):
                     if start_token in task:
-                        tasks = tasks[i : i + num_tasks]
+                        tasks = tasks[i: i + num_tasks]
                         break
 
                 # Ensure exact number of tasks is generated

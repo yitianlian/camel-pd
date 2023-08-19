@@ -21,7 +21,8 @@ parametrize = pytest.mark.parametrize(
     "model",
     [
         pytest.param(ModelType.GPT_3_5_TURBO, marks=pytest.mark.model_backend),
-        pytest.param(ModelType.GPT_3_5_TURBO_16K, marks=pytest.mark.model_backend),
+        pytest.param(ModelType.GPT_3_5_TURBO_16K,
+                     marks=pytest.mark.model_backend),
         pytest.param(ModelType.GPT_4, marks=pytest.mark.model_backend),
         ModelType.STUB,
     ],
@@ -33,8 +34,8 @@ def test_model_factory(model):
     model_config_dict = ChatGPTConfig().__dict__
     model_inst = ModelFactory.create(model, model_config_dict)
     messages = [
-        {"role": "system", "content": "Initialize system",},
-        {"role": "user", "content": "Hello",},
+        {"role": "system", "content": "Initialize system", },
+        {"role": "user", "content": "Hello", },
     ]
     response = model_inst.run(messages)
     assert isinstance(response, dict)

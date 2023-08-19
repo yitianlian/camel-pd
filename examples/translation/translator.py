@@ -99,7 +99,8 @@ def translate_content(args: argparse.Namespace, file_path: str, language: str) -
             "Sentence to translate: " + json_data[f"message_{i+1}"]["content"]
         )
 
-        sys_msg_generator = SystemMessageGenerator(task_type=TaskType.TRANSLATION)
+        sys_msg_generator = SystemMessageGenerator(
+            task_type=TaskType.TRANSLATION)
 
         assistant_sys_msg = sys_msg_generator.from_dict(
             meta_dict=dict(language=language.capitalize()),
@@ -169,7 +170,8 @@ def main(args: argparse.Namespace) -> None:
         pool = multiprocessing.Pool()
         # Apply parallel translation to all .json files
         for file_path in json_file_paths:
-            pool.apply_async(translate_content, args=(args, file_path, language))
+            pool.apply_async(translate_content, args=(
+                args, file_path, language))
         pool.close()
         pool.join()
     else:

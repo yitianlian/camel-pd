@@ -15,7 +15,7 @@ import pytest
 
 from camel.prompts import PromptTemplateGenerator, TextPrompt
 from camel.typing import RoleType, TaskType
-
+# flake8: noqa: E501
 
 @pytest.mark.parametrize(
     "task_role_tuple",

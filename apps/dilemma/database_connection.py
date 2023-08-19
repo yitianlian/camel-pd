@@ -41,7 +41,8 @@ class DatabaseConnection:
             )
             return conn
 
-        self.pool = sqlalchemy.create_engine("mysql+pymysql://", creator=getconn,)
+        self.pool = sqlalchemy.create_engine(
+            "mysql+pymysql://", creator=getconn,)
 
     def __del__(self):
         self.connector.close()
@@ -54,6 +55,7 @@ class DatabaseConnection:
             )
             db_conn.execute(
                 insert_stmt,
-                parameters={"file_name": file_name, "who_is_better": who_is_better,},
+                parameters={"file_name": file_name,
+                            "who_is_better": who_is_better, },
             )
             db_conn.commit()

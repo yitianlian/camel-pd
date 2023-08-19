@@ -30,7 +30,8 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
     # Skip full test only tests if not in full test mode
     if not config.getoption("--full-test-mode"):
-        skip_full_test = pytest.mark.skip(reason="Test runs only in full test mode")
+        skip_full_test = pytest.mark.skip(
+            reason="Test runs only in full test mode")
         for item in items:
             if "full_test_only" in item.keywords:
                 item.add_marker(skip_full_test)

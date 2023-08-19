@@ -45,7 +45,7 @@ def generate_tasks(
     # Filter out the generated response to include the tasks only
     for i, task in enumerate(tasks):
         if start_token in task:
-            tasks = tasks[i : i + num_tasks]
+            tasks = tasks[i: i + num_tasks]
             break
 
     # Ensure exact number of tasks is generated

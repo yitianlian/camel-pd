@@ -121,7 +121,8 @@ class RolePlaying:
         )
 
         self.planned_task_prompt: Optional[TextPrompt] = None
-        self.init_planned_task_prompt(task_planner_agent_kwargs, output_language)
+        self.init_planned_task_prompt(
+            task_planner_agent_kwargs, output_language)
 
         sys_msg_generator = SystemMessageGenerator(
             task_type=self.task_type, **(sys_msg_generator_kwargs or {})
@@ -187,7 +188,8 @@ class RolePlaying:
             task_specify_meta_dict = {}
             if self.task_type in [TaskType.AI_SOCIETY, TaskType.MISALIGNMENT]:
                 task_specify_meta_dict.update(
-                    dict(assistant_role=assistant_role_name, user_role=user_role_name)
+                    dict(assistant_role=assistant_role_name,
+                         user_role=user_role_name)
                 )
             task_specify_meta_dict.update(extend_task_specify_meta_dict or {})
             if self.model_type is not None:
@@ -263,7 +265,8 @@ class RolePlaying:
             TaskType.MISALIGNMENT,
         ]:
             extend_sys_msg_meta_dicts = [
-                dict(assistant_role=assistant_role_name, user_role=user_role_name)
+                dict(assistant_role=assistant_role_name,
+                     user_role=user_role_name)
                 for _ in range(2)
             ]
         if extend_sys_msg_meta_dicts is not None:
@@ -474,7 +477,8 @@ class RolePlaying:
         if user_response.terminated or user_response.msgs is None:
             return (
                 ChatAgentResponse([], False, {}),
-                ChatAgentResponse([], user_response.terminated, user_response.info),
+                ChatAgentResponse(
+                    [], user_response.terminated, user_response.info),
             )
         user_msg = self.reduce_message_options(user_response.msgs)
         self.user_agent.submit_message(user_msg)
@@ -494,5 +498,6 @@ class RolePlaying:
             ChatAgentResponse(
                 [assistant_msg], assistant_response.terminated, assistant_response.info
             ),
-            ChatAgentResponse([user_msg], user_response.terminated, user_response.info),
+            ChatAgentResponse(
+                [user_msg], user_response.terminated, user_response.info),
         )

@@ -42,7 +42,8 @@ def test_chat_agent(model: ModelType):
     )
     assistant = PlayerAgent(system_msg, model=model, model_config=model_config)
 
-    assert str(assistant) == ("PlayerAgent(doctor, " f"RoleType.ASSISTANT, {str(model)})")
+    assert str(assistant) == (
+        "PlayerAgent(doctor, " f"RoleType.ASSISTANT, {str(model)})")
 
     assistant.reset()
     user_msg = BaseMessage(
@@ -207,7 +208,8 @@ def test_chat_agent_stream_output():
     )
 
     stream_model_config = ChatGPTConfig(temperature=0, n=2, stream=True)
-    stream_assistant = PlayerAgent(system_msg, model_config=stream_model_config)
+    stream_assistant = PlayerAgent(
+        system_msg, model_config=stream_model_config)
     stream_assistant.reset()
     stream_assistant_response = stream_assistant.step(user_msg)
 
@@ -231,7 +233,8 @@ def test_set_output_language():
         meta_dict=None,
         content="You are a help assistant.",
     )
-    agent = PlayerAgent(system_message=system_message, model=ModelType.GPT_3_5_TURBO)
+    agent = PlayerAgent(system_message=system_message,
+                        model=ModelType.GPT_3_5_TURBO)
     assert agent.output_language is None
 
     # Set the output language to "Arabic"
@@ -258,7 +261,7 @@ def test_set_multiple_output_language():
                                  role_type=RoleType.ASSISTANT, meta_dict=None,
                                  content="You are a help assistant.")
     agent = PlayerAgent(system_message=system_message,
-                      model=ModelType.GPT_3_5_TURBO)
+                        model=ModelType.GPT_3_5_TURBO)
 
     # Verify that the length of the system message is kept constant even when
     # multiple set_output_language operations are called
@@ -278,7 +281,7 @@ def test_token_exceed_return():
                                  role_type=RoleType.ASSISTANT, meta_dict=None,
                                  content="You are a help assistant.")
     agent = PlayerAgent(system_message=system_message,
-                      model=ModelType.GPT_3_5_TURBO)
+                        model=ModelType.GPT_3_5_TURBO)
 
     expect_info = {
         "id": None,
@@ -301,11 +304,11 @@ def test_function_enabled():
     model_config = FunctionCallingConfig(
         functions=[func.as_dict() for func in MATH_FUNCS])
     agent_no_func = PlayerAgent(system_message=system_message,
-                              model_config=model_config, model=ModelType.GPT_4)
+                                model_config=model_config, model=ModelType.GPT_4)
     agent_with_funcs = PlayerAgent(system_message=system_message,
-                                 model_config=model_config,
-                                 model=ModelType.GPT_4,
-                                 function_list=MATH_FUNCS)
+                                   model_config=model_config,
+                                   model=ModelType.GPT_4,
+                                   function_list=MATH_FUNCS)
 
     assert not agent_no_func.is_function_calling_enabled()
     assert agent_with_funcs.is_function_calling_enabled()
@@ -319,7 +322,7 @@ def test_function_calling():
     model_config = FunctionCallingConfig(
         functions=[func.as_dict() for func in MATH_FUNCS])
     agent = PlayerAgent(system_message=system_message, model_config=model_config,
-                      model=ModelType.GPT_4, function_list=MATH_FUNCS)
+                        model=ModelType.GPT_4, function_list=MATH_FUNCS)
 
     ref_funcs = MATH_FUNCS
 

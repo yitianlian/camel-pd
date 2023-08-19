@@ -224,7 +224,8 @@ class PythonInterpreter:
         else:
             # For now we refuse anything else. Let's add things as we need
             # them.
-            raise InterpreterError(f"{expression.__class__.__name__} is not supported.")
+            raise InterpreterError(
+                f"{expression.__class__.__name__} is not supported.")
 
     def _execute_assign(self, assign: ast.Assign) -> Any:
         targets = assign.targets
@@ -278,7 +279,8 @@ class PythonInterpreter:
         if index in value:
             return value[index]
         if isinstance(index, str) and isinstance(value, Mapping):
-            close_matches = difflib.get_close_matches(index, list(value.keys()))
+            close_matches = difflib.get_close_matches(
+                index, list(value.keys()))
             if len(close_matches) > 0:
                 return value[close_matches[0]]
 
@@ -294,7 +296,8 @@ class PythonInterpreter:
 
     def _execute_condition(self, condition):
         if len(condition.ops) > 1:
-            raise InterpreterError("Cannot evaluate conditions with multiple operators")
+            raise InterpreterError(
+                "Cannot evaluate conditions with multiple operators")
 
         left = self._execute_ast(condition.left)
         comparator = condition.ops[0]

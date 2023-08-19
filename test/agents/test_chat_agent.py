@@ -42,7 +42,8 @@ def test_chat_agent(model: ModelType):
     )
     assistant = ChatAgent(system_msg, model=model, model_config=model_config)
 
-    assert str(assistant) == ("ChatAgent(doctor, " f"RoleType.ASSISTANT, {str(model)})")
+    assert str(assistant) == (
+        "ChatAgent(doctor, " f"RoleType.ASSISTANT, {str(model)})")
 
     assistant.reset()
     user_msg = BaseMessage(
@@ -231,7 +232,8 @@ def test_set_output_language():
         meta_dict=None,
         content="You are a help assistant.",
     )
-    agent = ChatAgent(system_message=system_message, model=ModelType.GPT_3_5_TURBO)
+    agent = ChatAgent(system_message=system_message,
+                      model=ModelType.GPT_3_5_TURBO)
     assert agent.output_language is None
 
     # Set the output language to "Arabic"

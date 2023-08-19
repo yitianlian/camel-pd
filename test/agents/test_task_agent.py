@@ -25,7 +25,8 @@ from camel.configs import ChatGPTConfig
 from camel.typing import ModelType, TaskType
 
 parametrize = pytest.mark.parametrize(
-    "model", [ModelType.STUB, pytest.param(None, marks=pytest.mark.model_backend),]
+    "model", [ModelType.STUB, pytest.param(
+        None, marks=pytest.mark.model_backend),]
 )
 
 
@@ -69,7 +70,8 @@ def test_task_planner_agent(model: Optional[ModelType]):
         model=model,
     )
     specified_task_prompt = task_specify_agent.run(
-        original_task_prompt, meta_dict=dict(domain="Chemistry", language="Python")
+        original_task_prompt, meta_dict=dict(
+            domain="Chemistry", language="Python")
     )
     print(f"Specified task prompt:\n{specified_task_prompt}\n")
     task_planner_agent = TaskPlannerAgent(

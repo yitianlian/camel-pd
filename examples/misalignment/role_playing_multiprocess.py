@@ -43,7 +43,8 @@ def generate_data(
         with_task_specify=True,
         with_task_planner=False,
         task_type=TaskType.MISALIGNMENT,
-        task_specify_agent_kwargs=dict(model_config=ChatGPTConfig(temperature=1.4)),
+        task_specify_agent_kwargs=dict(
+            model_config=ChatGPTConfig(temperature=1.4)),
     )
 
     input_assistant_msg, _ = role_play_session.init_chat()
@@ -53,14 +54,16 @@ def generate_data(
             Fore.GREEN + "AI Assistant sys message:\n"
             f"{role_play_session.assistant_sys_msg}\n"
         )
-        print(Fore.BLUE + f"AI User sys message:\n{role_play_session.user_sys_msg}\n")
+        print(Fore.BLUE +
+              f"AI User sys message:\n{role_play_session.user_sys_msg}\n")
 
         print(Fore.YELLOW + f"Original task prompt:\n{task_prompt}\n")
         print(
             Fore.CYAN + "Specified task prompt:\n"
             f"{role_play_session.specified_task_prompt}\n"
         )
-        print(Fore.RED + f"Final task prompt:\n{role_play_session.task_prompt}\n")
+        print(
+            Fore.RED + f"Final task prompt:\n{role_play_session.task_prompt}\n")
 
     message_counter = 0
     message_dict: Dict[str, Any] = {}
@@ -100,7 +103,8 @@ def generate_data(
     # Set max number of messages for the chat
 
     while message_counter < max_num_messages:
-        assistant_response, user_response = role_play_session.step(input_assistant_msg)
+        assistant_response, user_response = role_play_session.step(
+            input_assistant_msg)
 
         # Condition 1: User terminates the chat
         if user_response.terminated:
@@ -155,7 +159,8 @@ def generate_data(
 
         # Save user message
         message_counter += 1
-        message_dict[f"message_{message_counter}"] = user_response.msg.to_dict()
+        message_dict[f"message_{message_counter}"] = user_response.msg.to_dict(
+        )
 
         # Condition 5: End token observed
         if "<CAMEL_TASK_DONE>" in user_response.msg.content:
@@ -164,7 +169,8 @@ def generate_data(
 
         # Save assistant message
         message_counter += 1
-        message_dict[f"message_{message_counter}"] = assistant_response.msg.to_dict()
+        message_dict[f"message_{message_counter}"] = assistant_response.msg.to_dict(
+        )
 
         input_assistant_msg = assistant_response.msg
 
@@ -211,7 +217,7 @@ def main() -> None:
                 # Filter out the generated response to include the tasks only
                 for i, task in enumerate(tasks):
                     if start_token in task:
-                        tasks = tasks[i : i + num_tasks]
+                        tasks = tasks[i: i + num_tasks]
                         break
 
                 # Ensure exact number of tasks is generated

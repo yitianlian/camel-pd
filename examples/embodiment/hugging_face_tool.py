@@ -34,7 +34,8 @@ def main():
         )
     ]
     action_space: List[BaseToolAgent]
-    embodied_agent = EmbodiedAgent(sys_msg, verbose=True, action_space=action_space,)
+    embodied_agent = EmbodiedAgent(
+        sys_msg, verbose=True, action_space=action_space,)
     user_msg = BaseMessage.make_user_message(
         role_name=role_name,
         content=(

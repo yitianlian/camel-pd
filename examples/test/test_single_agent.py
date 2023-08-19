@@ -21,7 +21,8 @@ import examples.single_agent
 from camel.typing import ModelType
 
 parametrize = pytest.mark.parametrize(
-    "model", [ModelType.STUB, pytest.param(None, marks=pytest.mark.model_backend),]
+    "model", [ModelType.STUB, pytest.param(
+        None, marks=pytest.mark.model_backend),]
 )
 
 

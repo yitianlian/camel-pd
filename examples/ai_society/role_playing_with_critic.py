@@ -40,8 +40,10 @@ def main() -> None:
         Fore.GREEN
         + f"AI Assistant sys message:\n{role_play_session.assistant_sys_msg}\n"
     )
-    print(Fore.BLUE + f"AI User sys message:\n{role_play_session.user_sys_msg}\n")
-    print(Fore.MAGENTA + f"Critic sys message:\n{role_play_session.critic_sys_msg}\n")
+    print(Fore.BLUE +
+          f"AI User sys message:\n{role_play_session.user_sys_msg}\n")
+    print(Fore.MAGENTA +
+          f"Critic sys message:\n{role_play_session.critic_sys_msg}\n")
 
     print(Fore.YELLOW + f"Original task prompt:\n{task_prompt}\n")
     print(
@@ -54,7 +56,8 @@ def main() -> None:
     input_assistant_msg, _ = role_play_session.init_chat()
     while n < chat_turn_limit:
         n += 1
-        assistant_response, user_response = role_play_session.step(input_assistant_msg)
+        assistant_response, user_response = role_play_session.step(
+            input_assistant_msg)
 
         if assistant_response.terminated:
             print(
@@ -75,7 +78,8 @@ def main() -> None:
             )
             break
 
-        print_text_animated(Fore.BLUE + f"AI User:\n\n{user_response.msg.content}\n")
+        print_text_animated(
+            Fore.BLUE + f"AI User:\n\n{user_response.msg.content}\n")
         print_text_animated(
             Fore.GREEN + f"AI Assistant:\n\n{assistant_response.msg.content}\n"
         )

@@ -29,6 +29,7 @@ from apps.common.auto_zip import AutoZip
 
 # flake8: noqa :E501
 
+
 def parse_arguments():
     """ Get command line arguments. """
 
@@ -142,7 +143,8 @@ def construct_ui(
                 dict(summary="ERROR_TEXT", gpt_solution="ERROR_TEXT"),
             )
         specified_task = rec["specified_task"]
-        lst = list((k, v) for k, v in rec.items() if k in {"summary", "gpt_solution"})
+        lst = list((k, v)
+                   for k, v in rec.items() if k in {"summary", "gpt_solution"})
         random.shuffle(lst)
         state = dict(
             name=name,
@@ -159,7 +161,8 @@ def construct_ui(
         else:
             who_is_better = state[choice]["who"]
         name = state["name"]
-        print("choice=", choice, "who_is_better=", who_is_better, "name=", name)
+        print("choice=", choice, "who_is_better=",
+              who_is_better, "name=", name)
         if db_conn is not None:
             db_conn.add_record(name, who_is_better)
 

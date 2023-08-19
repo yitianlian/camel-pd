@@ -51,7 +51,7 @@ def generate_tasks(
     # Filter out the generated response to include the tasks only
     for i, task in enumerate(tasks):
         if start_token in task:
-            tasks = tasks[i : i + num_tasks]
+            tasks = tasks[i: i + num_tasks]
             break
 
     # Ensure exact number of tasks is generated
@@ -96,7 +96,8 @@ def main() -> None:
             print(f"Generating tasks for {task_generator_prompt}")
             pool.apply_async(
                 generate_tasks,
-                (role_names, task_generator_prompt, start_token, num_tasks, sys_prompt),
+                (role_names, task_generator_prompt,
+                 start_token, num_tasks, sys_prompt),
             )
 
     pool.close()

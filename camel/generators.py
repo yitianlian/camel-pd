@@ -232,7 +232,8 @@ class SingleTxtGenerator:
 
         with open(text_file_path, "r") as f:
             data_list: List[str] = f.read().splitlines()
-            self.data_list = [" ".join(name.split(" ")[1:]) for name in data_list]
+            self.data_list = [" ".join(name.split(" ")[1:])
+                              for name in data_list]
 
     def from_role_files(self) -> Generator[str, None, None]:
         for data in self.data_list:
@@ -253,10 +254,12 @@ class CodeTaskPromptGenerator:
         languages_path: str = "data/code/languages.txt",
         domains_path: str = "data/code/domains.txt",
     ) -> Generator[Tuple[TextPrompt, str, str], None, None]:
-        language_generator = SingleTxtGenerator(languages_path).from_role_files()
+        language_generator = SingleTxtGenerator(
+            languages_path).from_role_files()
 
         for language in language_generator:
-            domains_generator = SingleTxtGenerator(domains_path).from_role_files()
+            domains_generator = SingleTxtGenerator(
+                domains_path).from_role_files()
             for domain in domains_generator:
                 generated_tasks_prompt = self.generate_tasks_prompt.format(
                     language=language, domain=domain, num_tasks=self.num_tasks

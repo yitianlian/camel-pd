@@ -25,6 +25,7 @@ from apps.data_explorer.loader import Datasets, load_datasets
 
 # flake8: noqa :E501
 
+
 def parse_arguments():
     """ Get command line arguments. """
 
@@ -89,8 +90,10 @@ def construct_ui(blocks, datasets: Datasets, default_dataset: Optional[str] = No
         default_dataset = "ai_society_chat"
 
     misalignment_set_names = {"misalignment"}
-    ordinary_datasets = [v for v in datasets.keys() if v not in misalignment_set_names]
-    misalignment_datasets = [v for v in datasets.keys() if v in misalignment_set_names]
+    ordinary_datasets = [
+        v for v in datasets.keys() if v not in misalignment_set_names]
+    misalignment_datasets = [
+        v for v in datasets.keys() if v in misalignment_set_names]
     default_dataset_name = (
         default_dataset
         if default_dataset in datasets.keys()
@@ -131,7 +134,8 @@ def construct_ui(blocks, datasets: Datasets, default_dataset: Optional[str] = No
                         [], label="ASSISTANT", value="", interactive=True
                     )
                 with gr.Column(scale=3):
-                    user_dd = gr.Dropdown([], label="USER", value="", interactive=True)
+                    user_dd = gr.Dropdown(
+                        [], label="USER", value="", interactive=True)
         with gr.Column(scale=1):
             gr.Markdown(
                 '## CAMEL: Communicative Agents for "Mind" Exploration'
@@ -144,7 +148,8 @@ def construct_ui(blocks, datasets: Datasets, default_dataset: Optional[str] = No
                 "</div>"
             )
 
-    task_dd = gr.Dropdown([], label="Original task", value="", interactive=True)
+    task_dd = gr.Dropdown([], label="Original task",
+                          value="", interactive=True)
     specified_task_ta = gr.TextArea(label="Specified task", lines=2)
     chatbot = gr.Chatbot()
     accepted_st = gr.State(False)

@@ -396,7 +396,7 @@ class ChatAgent(BaseAgent):
             len(messages) > self.message_window_size
         ):
             messages = [ChatRecord("system", self.system_message)] + messages[
-                -self.message_window_size :
+                -self.message_window_size:
             ]
 
         openai_messages: List[OpenAIMessage]

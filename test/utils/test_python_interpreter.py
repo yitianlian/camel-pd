@@ -35,7 +35,8 @@ def test_import_success0(interpreter):
 a = pt.tensor([[1., -1.], [1., -1.]])
 openai.__version__"""
     execution_res = interpreter.execute(code)
-    assert torch.equal(interpreter.state["a"], torch.tensor([[1.0, -1.0], [1.0, -1.0]]))
+    assert torch.equal(interpreter.state["a"], torch.tensor(
+        [[1.0, -1.0], [1.0, -1.0]]))
     assert isinstance(execution_res, str)
 
 

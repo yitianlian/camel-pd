@@ -39,5 +39,5 @@ Do not provide any explanation. Just provide a translation."""
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.update(
-            {RoleType.ASSISTANT: self.ASSISTANT_PROMPT,}
+            {RoleType.ASSISTANT: self.ASSISTANT_PROMPT, }
         )

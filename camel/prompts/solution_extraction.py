@@ -41,5 +41,5 @@ Remember your task is not to summarize rather to extract the full solution."""
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.update(
-            {RoleType.ASSISTANT: self.ASSISTANT_PROMPT,}
+            {RoleType.ASSISTANT: self.ASSISTANT_PROMPT, }
         )
