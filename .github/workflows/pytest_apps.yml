@@ -5,9 +5,9 @@ name: Pytest Gradio Apps and Examples
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master","pd" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master","pd" ]
 
 permissions:
   contents: read
