@@ -13,7 +13,12 @@
 # =========== Copyright 2023 @ CAMEL-AI.org. All Rights Reserved. ===========
 from .base import BaseAgent
 from .chat_agent import ChatAgent, ChatAgentResponse
-from .task_agent import TaskPlannerAgent, TaskSpecifyAgent
+from .task_agent import (
+    TaskSpecifyAgent,
+    TaskPlannerAgent,
+    TaskCreationAgent,
+    TaskPrioritizationAgent,
+)
 from .critic_agent import CriticAgent
 from .tool_agents.base import BaseToolAgent
 from .tool_agents.hugging_face_tool_agent import HuggingFaceToolAgent
@@ -21,14 +26,15 @@ from .embodied_agent import EmbodiedAgent
 from .player_agent import PlayerAgent
 
 __all__ = [
-    "BaseAgent",
-    "ChatAgent",
-    "ChatAgentResponse",
-    "TaskSpecifyAgent",
-    "TaskPlannerAgent",
-    "CriticAgent",
-    "BaseToolAgent",
-    "HuggingFaceToolAgent",
-    "EmbodiedAgent",
-    "PlayerAgent",
+    'BaseAgent',
+    'ChatAgent',
+    'ChatAgentResponse',
+    'TaskSpecifyAgent',
+    'TaskPlannerAgent',
+    'TaskCreationAgent',
+    'TaskPrioritizationAgent',
+    'CriticAgent',
+    'BaseToolAgent',
+    'HuggingFaceToolAgent',
+    'EmbodiedAgent',
 ]

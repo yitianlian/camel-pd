@@ -105,8 +105,6 @@ def generate_data(
 
         assistant_response, user_response = role_play_session.step(input_assistant_msg)
 
-        input_assistant_msg = assistant_response.msg
-
         # Condition 1: User terminates the chat
         if user_response.terminated and user_response.info is not None:
             message_dict["termination_reason"] = (
@@ -172,6 +170,8 @@ def generate_data(
         # Save assistant message
         message_counter += 1
         message_dict[f"message_{message_counter}"] = assistant_response.msg.to_dict()
+
+        input_assistant_msg = assistant_response.msg
 
     message_dict["num_messages"] = message_counter
 
