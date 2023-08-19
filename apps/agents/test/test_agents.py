@@ -26,7 +26,6 @@ from apps.agents.agents import (
 )
 
 
-# flake8: noqa :E501
 def test_construct_blocks():
     blocks = construct_blocks(None)
     assert isinstance(blocks, gr.Blocks)
@@ -57,8 +56,22 @@ def test_session():
         with_task_specifier = False
         word_limit = 50
         language = "English"
-        state, specified_task_prompt, planned_task_upd, chat, progress_upd = role_playing_start(
-            state, society_name, assistant, user, original_task, max_messages, with_task_specifier, word_limit, language
+        (
+            state,
+            specified_task_prompt,
+            planned_task_upd,
+            chat,
+            progress_upd,
+        ) = role_playing_start(
+            state,
+            society_name,
+            assistant,
+            user,
+            original_task,
+            max_messages,
+            with_task_specifier,
+            word_limit,
+            language,
         )
 
         assert state.session is not None
@@ -68,7 +81,12 @@ def test_session():
         assert state.session is not None
 
         for _ in range(5):
-            state, chat, progress_update, start_bn_update = role_playing_chat_cont(state)
+            (
+                state,
+                chat,
+                progress_update,
+                start_bn_update,
+            ) = role_playing_chat_cont(state)
 
         state, _, _ = stop_session(state)
 

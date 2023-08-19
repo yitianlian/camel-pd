@@ -67,15 +67,20 @@ class State:
 
 
 def parse_arguments():
-    """ Get command line arguments. """
+    """Get command line arguments."""
 
     parser = argparse.ArgumentParser("Camel data explorer")
-    parser.add_argument("--api-key", type=str, default=None, help="OpenAI API key")
+    parser.add_argument(
+        "--api-key", type=str, default=None, help="OpenAI API key"
+    )
     parser.add_argument(
         "--share", type=bool, default=False, help="Expose the web UI to Gradio"
     )
     parser.add_argument(
-        "--server-port", type=int, default=8080, help="Port ot run the web page on"
+        "--server-port",
+        type=int,
+        default=8080,
+        help="Port ot run the web page on",
     )
     parser.add_argument(
         "--inbrowser",
@@ -97,7 +102,7 @@ def parse_arguments():
 
 
 def load_roles(path: str) -> List[str]:
-    """ Load roles from list files.
+    """Load roles from list files.
 
     Args:
         path (str): Path to the TXT file.
@@ -121,7 +126,7 @@ def load_roles(path: str) -> List[str]:
 
 
 def cleanup_on_launch(state) -> Tuple[State, ChatBotHistory, Dict]:
-    """ Prepare the UI for a new session.
+    """Prepare the UI for a new session.
 
     Args:
         state (State): Role playing state.
@@ -151,7 +156,7 @@ def role_playing_start(
     word_limit: int,
     language: str,
 ) -> Union[Dict, Tuple[State, str, Union[str, Dict], ChatBotHistory, Dict]]:
-    """ Creates a role playing session.
+    """Creates a role playing session.
 
     Args:
         state (State): Role playing state.
@@ -211,7 +216,11 @@ def role_playing_start(
             extend_task_specify_meta_dict=meta_dict,
             output_language=language,
         )
-    except (openai.error.RateLimitError, tenacity.RetryError, RuntimeError) as ex:
+    except (
+        openai.error.RateLimitError,
+        tenacity.RetryError,
+        RuntimeError,
+    ) as ex:
         print("OpenAI API exception 0 " + str(ex))
         return (state, str(ex), "", [], gr.update())
 
@@ -228,20 +237,33 @@ def role_playing_start(
         else ""
     )
     planned_task_prompt = (
-        session.planned_task_prompt if session.planned_task_prompt is not None else ""
+        session.planned_task_prompt
+        if session.planned_task_prompt is not None
+        else ""
     )
 
     planned_task_upd = gr.update(
-        value=planned_task_prompt, visible=session.planned_task_prompt is not None
+        value=planned_task_prompt,
+        visible=session.planned_task_prompt is not None,
     )
 
-    progress_update = gr.update(maximum=state.max_messages, value=1, visible=True)
+    progress_update = gr.update(
+        maximum=state.max_messages, value=1, visible=True
+    )
 
-    return (state, specified_task_prompt, planned_task_upd, state.chat, progress_update)
+    return (
+        state,
+        specified_task_prompt,
+        planned_task_upd,
+        state.chat,
+        progress_update,
+    )
 
 
-def role_playing_chat_init(state) -> Union[Dict, Tuple[State, ChatBotHistory, Dict]]:
-    """ Initialize role playing.
+def role_playing_chat_init(
+    state,
+) -> Union[Dict, Tuple[State, ChatBotHistory, Dict]]:
+    """Initialize role playing.
 
     Args:
         state (State): Role playing state.
@@ -262,21 +284,27 @@ def role_playing_chat_init(state) -> Union[Dict, Tuple[State, ChatBotHistory, Di
     try:
         init_assistant_msg: BaseMessage
         init_assistant_msg, _ = session.init_chat()
-    except (openai.error.RateLimitError, tenacity.RetryError, RuntimeError) as ex:
+    except (
+        openai.error.RateLimitError,
+        tenacity.RetryError,
+        RuntimeError,
+    ) as ex:
         print("OpenAI API exception 1 " + str(ex))
         state.session = None
         return state, state.chat, gr.update()
 
     state.saved_assistant_msg = init_assistant_msg
 
-    progress_update = gr.update(maximum=state.max_messages, value=1, visible=True)
+    progress_update = gr.update(
+        maximum=state.max_messages, value=1, visible=True
+    )
 
     return state, state.chat, progress_update
 
 
 # WORKAROUND: do not add type hints for session and chatbot_history
 def role_playing_chat_cont(state) -> Tuple[State, ChatBotHistory, Dict, Dict]:
-    """ Produce a pair of messages by an assistant and a user.
+    """Produce a pair of messages by an assistant and a user.
         To be run multiple times.
 
     Args:
@@ -299,8 +327,14 @@ def role_playing_chat_cont(state) -> Tuple[State, ChatBotHistory, Dict, Dict]:
         return state, state.chat, gr.update(), gr.update()
 
     try:
-        assistant_response, user_response = session.step(state.saved_assistant_msg)
-    except (openai.error.RateLimitError, tenacity.RetryError, RuntimeError) as ex:
+        assistant_response, user_response = session.step(
+            state.saved_assistant_msg
+        )
+    except (
+        openai.error.RateLimitError,
+        tenacity.RetryError,
+        RuntimeError,
+    ) as ex:
         print("OpenAI API exception 2 " + str(ex))
         state.session = None
         return state, state.chat, gr.update(), gr.update()
@@ -319,7 +353,10 @@ def role_playing_chat_cont(state) -> Tuple[State, ChatBotHistory, Dict, Dict]:
     if len(state.chat) >= state.max_messages:
         state.session = None
 
-    if "CAMEL_TASK_DONE" in a_msg.content or "CAMEL_TASK_DONE" in u_msg.content:
+    if (
+        "CAMEL_TASK_DONE" in a_msg.content
+        or "CAMEL_TASK_DONE" in u_msg.content
+    ):
         state.session = None
 
     progress_update = gr.update(
@@ -334,7 +371,7 @@ def role_playing_chat_cont(state) -> Tuple[State, ChatBotHistory, Dict, Dict]:
 
 
 def stop_session(state) -> Tuple[State, Dict, Dict]:
-    """ Finish the session and leave chat contents as an artefact.
+    """Finish the session and leave chat contents as an artefact.
 
     Args:
         state (State): Role playing state.
@@ -351,7 +388,7 @@ def stop_session(state) -> Tuple[State, Dict, Dict]:
 
 
 def construct_ui(blocks, api_key: Optional[str] = None) -> None:
-    """ Build Gradio UI and populate with topics.
+    """Build Gradio UI and populate with topics.
 
     Args:
         api_key (str): OpenAI API key.
@@ -378,7 +415,9 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
             user_role = "Sociology"
             default_task = "Develop a poll app"
 
-        assistant_role_path = os.path.join(REPO_ROOT, f"data/{assistant_role_subpath}")
+        assistant_role_path = os.path.join(
+            REPO_ROOT, f"data/{assistant_role_subpath}"
+        )
         user_role_path = os.path.join(REPO_ROOT, f"data/{user_role_subpath}")
 
         society_info = dict(
@@ -454,7 +493,9 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
     with gr.Row():
         with gr.Column():
             with gr.Row():
-                task_specifier_cb = gr.Checkbox(value=True, label="With task specifier")
+                task_specifier_cb = gr.Checkbox(
+                    value=True, label="With task specifier"
+                )
             with gr.Row():
                 ts_word_limit_nb = gr.Number(
                     value=TaskSpecifyAgent.DEFAULT_WORD_LIMIT,
@@ -463,12 +504,21 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
                 )
         with gr.Column():
             with gr.Row():
-                num_messages_sl = gr.Slider(minimum=1, maximum=50, step=1,
-                                            value=10, interactive=True,
-                                            label="Messages to generate")
+                num_messages_sl = gr.Slider(
+                    minimum=1,
+                    maximum=50,
+                    step=1,
+                    value=10,
+                    interactive=True,
+                    label="Messages to generate",
+                )
             with gr.Row():
-                language_ta = gr.TextArea(label="Language", value="English",
-                                          lines=1, interactive=True)
+                language_ta = gr.TextArea(
+                    label="Language",
+                    value="English",
+                    lines=1,
+                    interactive=True,
+                )
         with gr.Column(scale=2):
             with gr.Row():
                 start_bn = gr.Button(
@@ -498,23 +548,46 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
     empty_state = State.empty()
     session_state: gr.State = gr.State(empty_state)
 
-    universal_task_bn.click(lambda: "Help me to do my job", None, original_task_ta)
+    universal_task_bn.click(
+        lambda: "Help me to do my job", None, original_task_ta
+    )
 
     task_specifier_cb.change(
         lambda v: gr.update(visible=v), task_specifier_cb, ts_word_limit_nb
     )
 
-    start_bn.click(cleanup_on_launch, session_state,
-                   [session_state, chatbot, start_bn], queue=False) \
-            .then(role_playing_start,
-                  [session_state, society_dd, assistant_ta, user_ta,
-                   original_task_ta, num_messages_sl,
-                   task_specifier_cb, ts_word_limit_nb, language_ta],
-                  [session_state, specified_task_ta, task_prompt_ta,
-                   chatbot, progress_sl],
-                  queue=False) \
-            .then(role_playing_chat_init, session_state,
-                  [session_state, chatbot, progress_sl], queue=False)
+    start_bn.click(
+        cleanup_on_launch,
+        session_state,
+        [session_state, chatbot, start_bn],
+        queue=False,
+    ).then(
+        role_playing_start,
+        [
+            session_state,
+            society_dd,
+            assistant_ta,
+            user_ta,
+            original_task_ta,
+            num_messages_sl,
+            task_specifier_cb,
+            ts_word_limit_nb,
+            language_ta,
+        ],
+        [
+            session_state,
+            specified_task_ta,
+            task_prompt_ta,
+            chatbot,
+            progress_sl,
+        ],
+        queue=False,
+    ).then(
+        role_playing_chat_init,
+        session_state,
+        [session_state, chatbot, progress_sl],
+        queue=False,
+    )
 
     blocks.load(
         role_playing_chat_cont,
@@ -523,7 +596,9 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
         every=0.5,
     )
 
-    clear_bn.click(stop_session, session_state, [session_state, progress_sl, start_bn])
+    clear_bn.click(
+        stop_session, session_state, [session_state, progress_sl, start_bn]
+    )
 
     society_dd.change(
         change_society, society_dd, [assistant_dd, user_dd, original_task_ta]
@@ -531,13 +606,15 @@ def construct_ui(blocks, api_key: Optional[str] = None) -> None:
     assistant_dd.change(lambda dd: dd, assistant_dd, assistant_ta)
     user_dd.change(lambda dd: dd, user_dd, user_ta)
 
-    blocks.load(change_society, society_dd, [assistant_dd, user_dd, original_task_ta])
+    blocks.load(
+        change_society, society_dd, [assistant_dd, user_dd, original_task_ta]
+    )
     blocks.load(lambda dd: dd, assistant_dd, assistant_ta)
     blocks.load(lambda dd: dd, user_dd, user_ta)
 
 
 def construct_blocks(api_key: Optional[str]):
-    """ Construct Agents app but do not launch it.
+    """Construct Agents app but do not launch it.
 
     Args:
         api_key (Optional[str]): OpenAI API key.
@@ -555,7 +632,7 @@ def construct_blocks(api_key: Optional[str]):
 
 
 def main():
-    """ Entry point. """
+    """Entry point."""
 
     args = parse_arguments()
 
